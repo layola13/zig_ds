@@ -1,4 +1,4 @@
-mconst std = @import("std");
+const std = @import("std");
 const Hashable = @import("../../hashable.zig").Hashable;
 const HashKey = @import("../../hash_key.zig");
 const MemoryManager = @import("memory_manager.zig").MemoryManager;
