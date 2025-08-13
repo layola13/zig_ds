@@ -1,5 +1,8 @@
 const std = @import("std");
-const ds = @import("../ds/ds.zig");
+const lib = @import("zig-ds");
+const ArrayList = lib.ArrayList;
+const Shuffle = lib.ds.Shuffle;
+const HashSet = lib.ds.HashSet;
 
 const E = struct {
     x: i32,
@@ -11,7 +14,7 @@ const E = struct {
 };
 
 test "basic" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
 
     for (0..20) |i| {
@@ -26,7 +29,7 @@ test "basic" {
 }
 
 test "reserve" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
 
     for (0..5) |i| {
@@ -49,7 +52,7 @@ test "reserve" {
 }
 
 test "init" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(5, 10);
 
@@ -58,7 +61,7 @@ test "init" {
         try std.testing.expectEqual(10, a.items[i]);
     }
 
-    var b = ds.ArrayList(i32).initCapacity(std.testing.allocator, 2);
+    var b = ArrayList(i32).initCapacity(std.testing.allocator, 2);
     defer b.deinit();
     try b.resize(10, 10);
     try std.testing.expectEqual(@as(usize, 10), b.items.len);
@@ -69,7 +72,7 @@ test "init" {
 }
 
 test "pack" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(20, 0);
     a.pack();
@@ -80,7 +83,7 @@ test "pack" {
     }
     try std.testing.expectEqual(@as(usize, 30), a.items.len);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.resize(20, 0);
     b.clearRetainingCapacity();
@@ -90,7 +93,7 @@ test "pack" {
 }
 
 test "iter" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(20, 0);
     for (a.items, 0..) |*e, i| {
@@ -103,7 +106,7 @@ test "iter" {
 }
 
 test "swap" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.append(2);
     try a.append(3);
@@ -115,7 +118,7 @@ test "swap" {
 }
 
 test "copy" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.append(2);
     try a.append(3);
@@ -125,7 +128,7 @@ test "copy" {
 }
 
 test "front" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
 
     try a.append(0);
@@ -140,7 +143,7 @@ test "front" {
 }
 
 test "back" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
 
     try a.append(0);
@@ -152,7 +155,7 @@ test "back" {
 }
 
 test "popFront" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(5, 0);
     for (a.items, 0..) |*e, i| {
@@ -165,7 +168,7 @@ test "popFront" {
         try std.testing.expectEqual(i + 1, a.items[i]);
     }
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(1);
     const y = b.orderedRemove(0);
@@ -174,7 +177,7 @@ test "popFront" {
 }
 
 test "pushFront" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(5, 0);
     for (a.items, 0..) |*e, i| {
@@ -187,7 +190,7 @@ test "pushFront" {
         try std.testing.expectEqual(i, a.items[i + 1]);
     }
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.insert(0, 10);
     try std.testing.expectEqual(@as(usize, 1), b.items.len);
@@ -195,7 +198,7 @@ test "pushFront" {
 }
 
 test "pushBack" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.append(1);
     try std.testing.expectEqual(@as(i32, 1), a.items[a.items.len - 1]);
@@ -215,7 +218,7 @@ test "pushBack" {
 }
 
 test "popBack" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     var x: i32 = 0;
     try a.append(x);
@@ -232,7 +235,7 @@ test "popBack" {
 }
 
 test "swapPop" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(5, 0);
     for (a.items, 0..) |*e, i| {
@@ -245,13 +248,13 @@ test "swapPop" {
     try std.testing.expectEqual(@as(i32, 2), a.items[2]);
     try std.testing.expectEqual(@as(i32, 3), a.items[3]);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(0);
     _ = b.swapRemove(0);
     try std.testing.expectEqual(@as(usize, 0), b.items.len);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     try c.append(0);
     try c.append(1);
@@ -259,7 +262,7 @@ test "swapPop" {
     try std.testing.expectEqual(@as(usize, 1), c.items.len);
     try std.testing.expectEqual(@as(i32, 1), c.items[0]);
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.append(0);
     try d.append(1);
@@ -271,7 +274,7 @@ test "swapPop" {
 }
 
 test "trim" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(20, 0);
     for (a.items, 0..) |*e, i| {
@@ -285,13 +288,13 @@ test "trim" {
 }
 
 test "insert" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.insert(0, 1);
     try std.testing.expectEqual(@as(usize, 1), a.items.len);
     try std.testing.expectEqual(@as(i32, 1), a.items[0]);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     for (0..3) |i| {
         try b.append(i);
@@ -305,7 +308,7 @@ test "insert" {
     try std.testing.expectEqual(@as(i32, 1), b.items[2]);
     try std.testing.expectEqual(@as(i32, 2), b.items[3]);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     for (0..3) |i| {
         try c.append(i);
@@ -319,7 +322,7 @@ test "insert" {
     try std.testing.expectEqual(@as(i32, 1), c.items[2]);
     try std.testing.expectEqual(@as(i32, 2), c.items[3]);
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     for (0..3) |i| {
         try d.append(i);
@@ -333,7 +336,7 @@ test "insert" {
     try std.testing.expectEqual(@as(i32, 5), d.items[2]);
     try std.testing.expectEqual(@as(i32, 2), d.items[3]);
 
-    var e = ds.ArrayList(i32).init(std.testing.allocator);
+    var e = ArrayList(i32).init(std.testing.allocator);
     defer e.deinit();
     for (0..3) |i| {
         try e.append(i);
@@ -347,7 +350,7 @@ test "insert" {
     try std.testing.expectEqual(@as(i32, 2), e.items[2]);
     try std.testing.expectEqual(@as(i32, 5), e.items[3]);
 
-    var f = ds.ArrayList(i32).init(std.testing.allocator);
+    var f = ArrayList(i32).init(std.testing.allocator);
     defer f.deinit();
     try f.insert(0, 0);
     try f.insert(1, 1);
@@ -356,7 +359,7 @@ test "insert" {
 
     const s: usize = 20;
     for (0..s) |i| {
-        var g = ds.ArrayList(i32).initCapacity(std.testing.allocator, s);
+        var g = ArrayList(i32).initCapacity(std.testing.allocator, s);
         defer g.deinit();
         for (0..s) |j| {
             try g.append(j);
@@ -376,7 +379,7 @@ test "insert" {
 }
 
 test "removeAt" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     for (0..3) |i| {
         try a.append(i);
@@ -401,7 +404,7 @@ test "removeAt" {
 
     try std.testing.expectEqual(@as(usize, 0), a.items.len);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(1);
     _ = b.orderedRemove(0);
@@ -413,7 +416,7 @@ test "removeAt" {
     try std.testing.expectEqual(@as(usize, 1), b.items.len);
 
     const len = b.capacity;
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     for (0..len) |i| {
         try c.append(i);
@@ -423,7 +426,7 @@ test "removeAt" {
 }
 
 test "join" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     var buf: [100]u8 = undefined;
     const writer = std.io.fixedBufferStream(&buf).writer();
@@ -448,7 +451,7 @@ test "join" {
 }
 
 test "reverse" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.append(0);
     try a.append(1);
@@ -456,7 +459,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 1), a.items[0]);
     try std.testing.expectEqual(@as(i32, 0), a.items[1]);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(0);
     try b.append(1);
@@ -466,7 +469,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 1), b.items[1]);
     try std.testing.expectEqual(@as(i32, 0), b.items[2]);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     try c.append(0);
     try c.append(1);
@@ -478,7 +481,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 1), c.items[2]);
     try std.testing.expectEqual(@as(i32, 0), c.items[3]);
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.append(0);
     try d.append(1);
@@ -492,7 +495,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 1), d.items[3]);
     try std.testing.expectEqual(@as(i32, 0), d.items[4]);
 
-    var e = ds.ArrayList(i32).init(std.testing.allocator);
+    var e = ArrayList(i32).init(std.testing.allocator);
     defer e.deinit();
     for (0..27) |i| {
         try e.append(i);
@@ -502,7 +505,7 @@ test "reverse" {
         try std.testing.expectEqual(26 - i, e.items[i]);
     }
 
-    var f = ds.ArrayList(i32).init(std.testing.allocator);
+    var f = ArrayList(i32).init(std.testing.allocator);
     defer f.deinit();
     for (0..4) |i| {
         try f.append(i);
@@ -512,7 +515,7 @@ test "reverse" {
         try std.testing.expectEqual(3 - i, f.items[i]);
     }
 
-    var g = ds.ArrayList(i32).init(std.testing.allocator);
+    var g = ArrayList(i32).init(std.testing.allocator);
     defer g.deinit();
     try g.append(8);
     try g.append(7);
@@ -531,7 +534,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 10), g.items[2]);
     try std.testing.expectEqual(@as(i32, 8), g.items[3]);
 
-    var h = ds.ArrayList(i32).initCapacity(std.testing.allocator, 10);
+    var h = ArrayList(i32).initCapacity(std.testing.allocator, 10);
     defer h.deinit();
     for (0..10) |i| {
         try h.append(i);
@@ -541,7 +544,7 @@ test "reverse" {
         try std.testing.expectEqual(10 - i - 1, h.items[i]);
     }
 
-    var i = ds.ArrayList(i32).initCapacity(std.testing.allocator, 10);
+    var i = ArrayList(i32).initCapacity(std.testing.allocator, 10);
     defer i.deinit();
     for (0..10) |j| {
         try i.append(j);
@@ -554,7 +557,7 @@ test "reverse" {
         try std.testing.expectEqual(j, i.items[j]);
     }
 
-    var j = ds.ArrayList(i32).initCapacity(std.testing.allocator, 10);
+    var j = ArrayList(i32).initCapacity(std.testing.allocator, 10);
     defer j.deinit();
     for (0..10) |k| {
         try j.append(k);
@@ -563,7 +566,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 0), j.items[0]);
     try std.testing.expectEqual(@as(i32, 1), j.items[1]);
 
-    var k = ds.ArrayList(i32).initCapacity(std.testing.allocator, 10);
+    var k = ArrayList(i32).initCapacity(std.testing.allocator, 10);
     defer k.deinit();
     for (0..10) |l| {
         try k.append(l);
@@ -572,7 +575,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 1), k.items[0]);
     try std.testing.expectEqual(@as(i32, 0), k.items[1]);
 
-    var l = ds.ArrayList(i32).initCapacity(std.testing.allocator, 4);
+    var l = ArrayList(i32).initCapacity(std.testing.allocator, 4);
     defer l.deinit();
     for (0..4) |m| {
         try l.append(m);
@@ -583,7 +586,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 2), l.items[2]);
     try std.testing.expectEqual(@as(i32, 3), l.items[3]);
 
-    var m = ds.ArrayList(i32).init(std.testing.allocator);
+    var m = ArrayList(i32).init(std.testing.allocator);
     defer m.deinit();
     try m.resize(8, 0);
     for (m.items, 0..) |*item, n| {
@@ -599,7 +602,7 @@ test "reverse" {
     try std.testing.expectEqual(@as(i32, 5), m.items[6]);
     try std.testing.expectEqual(@as(i32, 4), m.items[7]);
 
-    var n = ds.ArrayList(i32).init(std.testing.allocator);
+    var n = ArrayList(i32).init(std.testing.allocator);
     defer n.deinit();
     try n.resize(8, 0);
     for (n.items, 0..) |*item, o| {
@@ -617,19 +620,19 @@ test "reverse" {
 }
 
 test "resize" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(1, 0);
     try std.testing.expect(a.capacity >= 1);
     try std.testing.expectEqual(@as(usize, 1), a.items.len);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.resize(4, 0);
     try std.testing.expect(b.capacity >= 4);
     try std.testing.expectEqual(@as(usize, 4), b.items.len);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     for (0..8) |i| {
         try c.append(i);
@@ -641,7 +644,7 @@ test "resize" {
         try std.testing.expectEqual(i, c.items[i]);
     }
 
-    var d = ds.ArrayList(i32).initCapacity(std.testing.allocator, 8);
+    var d = ArrayList(i32).initCapacity(std.testing.allocator, 8);
     defer d.deinit();
     for (0..8) |i| {
         try d.append(i);
@@ -655,7 +658,7 @@ test "resize" {
 }
 
 test "binarySearch" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     for (0..10) |i| {
         try a.append(i);
@@ -678,7 +681,7 @@ test "binarySearch" {
         try std.testing.expect(!a.binarySearch(i, i + 1, null));
     }
 
-    var b = ds.ArrayList(E).init(std.testing.allocator);
+    var b = ArrayList(E).init(std.testing.allocator);
     defer b.deinit();
 
     for (0..10) |i| {
@@ -701,7 +704,7 @@ test "binarySearch" {
 }
 
 test "indexOf" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try std.testing.expect(!a.indexOf(0));
     for (0..3) |i| {
@@ -714,7 +717,7 @@ test "indexOf" {
 }
 
 test "lastIndexOf" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try std.testing.expect(!a.lastIndexOf(0, null));
 
@@ -726,7 +729,7 @@ test "lastIndexOf" {
     try std.testing.expectEqual(@as(usize, 2), a.lastIndexOf(2, null).?);
     try std.testing.expect(!a.lastIndexOf(4, null));
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(0);
     try b.append(1);
@@ -743,7 +746,7 @@ test "lastIndexOf" {
 }
 
 test "blit" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     for (0..20) |i| {
         try a.append(i);
@@ -758,7 +761,7 @@ test "blit" {
         try std.testing.expectEqual(i, a.items[i]);
     }
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     for (0..20) |i| {
         try b.append(i);
@@ -773,7 +776,7 @@ test "blit" {
         try std.testing.expectEqual(i - 10, b.items[i]);
     }
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     for (0..20) |i| {
         try c.append(i);
@@ -793,11 +796,11 @@ test "blit" {
 }
 
 test "concat" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.append(0);
     try a.append(1);
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.append(2);
     try b.append(3);
@@ -814,11 +817,11 @@ test "concat" {
         try std.testing.expectEqual(i, a.items[i]);
     }
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.append(0);
     try d.append(1);
-    var e = ds.ArrayList(i32).init(std.testing.allocator);
+    var e = ArrayList(i32).init(std.testing.allocator);
     defer e.deinit();
     try e.append(2);
     try e.append(3);
@@ -831,7 +834,7 @@ test "concat" {
 }
 
 test "convert" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.appendSlice(&[_]i32{ 0, 1, 2, 3 });
 
@@ -842,7 +845,7 @@ test "convert" {
 }
 
 test "sortRange" {
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.append(0);
     try d.append(1);
@@ -858,7 +861,7 @@ test "sortRange" {
         try std.testing.expectEqual(sorted[i], val);
     }
 
-    var e = ds.ArrayList(i32).init(std.testing.allocator);
+    var e = ArrayList(i32).init(std.testing.allocator);
     defer e.deinit();
     try e.appendSlice(&[_]i32{ 9, 8, 1, 2, 3, 8, 9 });
     e.sort(void, std.math.order, 2, 3);
@@ -868,7 +871,7 @@ test "sortRange" {
         try std.testing.expectEqual(sorted2[i], val);
     }
 
-    var f = ds.ArrayList(i32).init(std.testing.allocator);
+    var f = ArrayList(i32).init(std.testing.allocator);
     defer f.deinit();
     try f.appendSlice(&[_]i32{ 1, 2, 3 });
     f.sort(void, std.math.order, 1, 2);
@@ -879,19 +882,19 @@ test "sortRange" {
 }
 
 test "sort" {
-    var v = ds.ArrayList(i32).init(std.testing.allocator);
+    var v = ArrayList(i32).init(std.testing.allocator);
     defer v.deinit();
     try v.append(4);
     v.sort(void, std.math.order, 0, v.items.len);
     try std.testing.expectEqual(@as(i32, 4), v.items[0]);
 
-    var w = ds.ArrayList(E).init(std.testing.allocator);
+    var w = ArrayList(E).init(std.testing.allocator);
     defer w.deinit();
     try w.append(E{ .x = 4 });
     w.sort(void, E.compare, 0, w.items.len);
     try std.testing.expectEqual(@as(i32, 4), w.items[0].x);
 
-    var x = ds.ArrayList(i32).init(std.testing.allocator);
+    var x = ArrayList(i32).init(std.testing.allocator);
     defer x.deinit();
     try x.append(4);
     try x.append(2);
@@ -899,7 +902,7 @@ test "sort" {
     try std.testing.expectEqual(@as(i32, 2), x.items[0]);
     try std.testing.expectEqual(@as(i32, 4), x.items[1]);
 
-    var y = ds.ArrayList(E).init(std.testing.allocator);
+    var y = ArrayList(E).init(std.testing.allocator);
     defer y.deinit();
     try y.append(E{ .x = 4 });
     try y.append(E{ .x = 2 });
@@ -907,7 +910,7 @@ test "sort" {
     try std.testing.expectEqual(@as(i32, 2), y.items[0].x);
     try std.testing.expectEqual(@as(i32, 4), y.items[1].x);
 
-    var z = ds.ArrayList(i32).init(std.testing.allocator);
+    var z = ArrayList(i32).init(std.testing.allocator);
     defer z.deinit();
     try z.append(4);
     try z.append(1);
@@ -922,7 +925,7 @@ test "sort" {
         j = i;
     }
 
-    var aa = ds.ArrayList(E).init(std.testing.allocator);
+    var aa = ArrayList(E).init(std.testing.allocator);
     defer aa.deinit();
     try aa.append(E{ .x = 4 });
     try aa.append(E{ .x = 1 });
@@ -939,7 +942,7 @@ test "sort" {
 }
 
 test "shuffle" {
-    var q = ds.ArrayList(i32).init(std.testing.allocator);
+    var q = ArrayList(i32).init(std.testing.allocator);
     defer q.deinit();
     try q.resize(10, 0);
     for (q.items, 0..) |*e, i| {
@@ -947,7 +950,7 @@ test "shuffle" {
     }
     var prng = std.rand.DefaultPrng.init(0);
     const rnd = prng.random();
-    ds.Shuffle(i32, q.items, rnd);
+    Shuffle(i32, q.items, rnd);
     try std.testing.expectEqual(@as(usize, 10), q.items.len);
     var set = std.ArrayList(i32).init(std.testing.allocator);
     defer set.deinit();
@@ -962,7 +965,7 @@ test "shuffle" {
 }
 
 test "iterator" {
-    var q = ds.ArrayList(i32).init(std.testing.allocator);
+    var q = ArrayList(i32).init(std.testing.allocator);
     defer q.deinit();
     for (0..10) |i| {
         try q.append(i);
@@ -987,9 +990,9 @@ test "iterator" {
 
 test "iteratorRemove" {
     for (0..5) |i| {
-        var a = ds.ArrayList(i32).init(std.testing.allocator);
+        var a = ArrayList(i32).init(std.testing.allocator);
         defer a.deinit();
-        var set = ds.HashSet(i32).init(std.testing.allocator);
+        var set = HashSet(i32).init(std.testing.allocator);
         defer set.deinit();
         for (0..5) |j| {
             try a.append(j);
@@ -1013,7 +1016,7 @@ test "iteratorRemove" {
         try std.testing.expect(set.count() == 0);
     }
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     for (0..5) |j| {
         try b.append(j);
@@ -1027,7 +1030,7 @@ test "iteratorRemove" {
 }
 
 test "remove" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.appendSlice(&[_]i32{ 0, 1, 2, 2, 2, 3 });
 
@@ -1050,14 +1053,14 @@ test "remove" {
 
     try std.testing.expect(a.items.len == 0);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.appendSlice(&[_]i32{ 0, 0, 0, 0, 0 });
     k = b.removeItem(0);
     try std.testing.expect(k);
     try std.testing.expect(b.items.len == 0);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     try c.appendSlice(&[_]i32{ 0, 1, 2, 2, 3, 3, 3 });
     _ = c.removeItem(2);
@@ -1079,13 +1082,13 @@ test "remove" {
     try std.testing.expectEqual(@as(usize, 1), c.items.len);
     try std.testing.expectEqual(@as(i32, 0), c.items[0]);
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.appendSlice(&[_]i32{ 2, 2, 2 });
     _ = d.removeItem(2);
     try std.testing.expectEqual(@as(usize, 0), d.items.len);
 
-    var e = ds.ArrayList(i32).init(std.testing.allocator);
+    var e = ArrayList(i32).init(std.testing.allocator);
     defer e.deinit();
     try e.appendSlice(&[_]i32{ 1, 1, 1, 2, 2, 2 });
     _ = e.removeItem(1);
@@ -1096,7 +1099,7 @@ test "remove" {
     _ = e.removeItem(2);
     try std.testing.expectEqual(@as(usize, 0), e.items.len);
 
-    var f = ds.ArrayList(i32).init(std.testing.allocator);
+    var f = ArrayList(i32).init(std.testing.allocator);
     defer f.deinit();
     try f.appendSlice(&[_]i32{ 1, 2, 3 });
     _ = f.removeItem(1);
@@ -1111,7 +1114,7 @@ test "remove" {
 }
 
 test "clone" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     for (0..3) |i| {
         try a.append(i);
@@ -1123,7 +1126,7 @@ test "clone" {
         try std.testing.expectEqual(i, copy.items[i]);
     }
 
-    var b = ds.ArrayList(E).init(std.testing.allocator);
+    var b = ArrayList(E).init(std.testing.allocator);
     defer b.deinit();
     for (0..3) |i| {
         try b.append(E{ .x = i });
@@ -1137,7 +1140,7 @@ test "clone" {
 }
 
 test "range" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.appendSlice(&[_]i32{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 
@@ -1166,13 +1169,13 @@ test "range" {
 }
 
 test "of" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.resize(3, 0);
     a.items[0] = 0;
     a.items[1] = 1;
     a.items[2] = 2;
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     try b.appendSlice(a.items);
 
@@ -1180,16 +1183,16 @@ test "of" {
     for (0..3) |i| {
         try std.testing.expectEqual(i, b.items[i]);
     }
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     try d.appendSlice(c.items);
     try std.testing.expect(d.items.len == 0);
 }
 
 test "addArray" {
-    var a = ds.ArrayList(i32).init(std.testing.allocator);
+    var a = ArrayList(i32).init(std.testing.allocator);
     defer a.deinit();
     try a.appendSlice(&[_]i32{ 1, 2, 3 });
     try std.testing.expectEqual(@as(usize, 3), a.items.len);
@@ -1197,7 +1200,7 @@ test "addArray" {
     try std.testing.expectEqual(@as(i32, 2), a.items[1]);
     try std.testing.expectEqual(@as(i32, 3), a.items[2]);
 
-    var b = ds.ArrayList(i32).init(std.testing.allocator);
+    var b = ArrayList(i32).init(std.testing.allocator);
     defer b.deinit();
     const arr_b = [_]i32{ 1, 2, 3 };
     try b.appendSlice(arr_b[1..]);
@@ -1205,14 +1208,14 @@ test "addArray" {
     try std.testing.expectEqual(@as(i32, 2), b.items[0]);
     try std.testing.expectEqual(@as(i32, 3), b.items[1]);
 
-    var c = ds.ArrayList(i32).init(std.testing.allocator);
+    var c = ArrayList(i32).init(std.testing.allocator);
     defer c.deinit();
     const arr_c = [_]i32{ 1, 2, 3 };
     try c.appendSlice(arr_c[2..]);
     try std.testing.expectEqual(@as(usize, 1), c.items.len);
     try std.testing.expectEqual(@as(i32, 3), c.items[0]);
 
-    var d = ds.ArrayList(i32).init(std.testing.allocator);
+    var d = ArrayList(i32).init(std.testing.allocator);
     defer d.deinit();
     const arr_d = [_]i32{ 1, 2, 3 };
     try d.appendSlice(arr_d[0..2]);
@@ -1220,7 +1223,7 @@ test "addArray" {
     try std.testing.expectEqual(@as(i32, 1), d.items[0]);
     try std.testing.expectEqual(@as(i32, 2), d.items[1]);
 
-    var e = ds.ArrayList(i32).initCapacity(std.testing.allocator, 2);
+    var e = ArrayList(i32).initCapacity(std.testing.allocator, 2);
     defer e.deinit();
     try e.appendSlice(&[_]i32{ 1, 2, 3, 4 });
 }

@@ -51,3 +51,4 @@ pub const NativeArrayTools = @import("../tools/NativeArrayTools.zig");
 pub const ObjectPool = @import("../tools/ObjectPool.zig");
 pub const RadixSort = @import("../tools/RadixSort.zig");
 pub const Shuffle = @import("../tools/Shuffle.zig");
+pub const ArrayList = @import("../linear/ArrayList.zig");

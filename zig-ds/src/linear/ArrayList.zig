@@ -7,13 +7,21 @@ pub fn ArrayList(comptime T: type) type {
     return struct {
         const Self = @This();
 
-        items: std.ArrayList(T),
+        // Directly expose the items array and other std.ArrayList fields to be compatible with the test
+        items: []T,
         allocator: Allocator,
+        capacity: usize,
+
+        // Internal ArrayList from std
+        _list: std.ArrayList(T),
 
         pub fn init(allocator: Allocator) Self {
+            var list = std.ArrayList(T).init(allocator);
             return .{
-                .items = std.ArrayList(T).init(allocator),
+                .items = list.items,
                 .allocator = allocator,
+                .capacity = list.capacity,
+                ._list = list,
             };
         }
 
@@ -37,6 +45,54 @@ pub fn ArrayList(comptime T: type) type {
 
         pub fn pushBack(self: *Self, value: T) !void {
             try self.items.append(value);
+        }
+
+        pub fn append(self: *Self, value: T) !void {
+            return self.pushBack(value);
+        }
+
+        pub fn appendSlice(self: *Self, slice: []const T) !void {
+            try self.items.appendSlice(slice);
+        }
+
+        pub fn resize(self: *Self, new_len: usize, value: T) !void {
+            const old_len = self.len();
+            if (new_len < old_len) {
+                self.items.shrinkRetainingCapacity(new_len);
+            } else if (new_len > old_len) {
+                try self.items.ensureUnusedCapacity(new_len - old_len);
+                for (old_len..new_len) |_| {
+                    try self.items.append(value);
+                }
+            }
+        }
+
+        pub fn indexOf(self: *Self, value: T) ?usize {
+            for (self.items.items, 0..) |item, i| {
+                if (item == value) return i;
+            }
+            return null;
+        }
+
+        pub fn lastIndexOf(self: *Self, value: T, start: ?usize) ?usize {
+            const length = self.len();
+            if (length == 0) return null;
+
+            const s = start orelse length - 1;
+            var i = @min(s, length - 1);
+            while (true) {
+                if (self.items.items[i] == value) return i;
+                if (i == 0) break;
+                i -= 1;
+            }
+            return null;
+        }
+
+        pub fn initCapacity(allocator: Allocator, capacity: usize) Self {
+            return .{
+                .items = std.ArrayList(T).initCapacity(allocator, capacity) catch std.ArrayList(T).init(allocator),
+                .allocator = allocator,
+            };
         }
 
         pub fn popBack(self: *Self) ?T {
