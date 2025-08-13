@@ -9,3 +9,4 @@ tmp/
 /*.hxml
 *.zig-cache
 *.tar.xz
+*.crush

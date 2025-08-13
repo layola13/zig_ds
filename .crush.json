@@ -1,0 +1,21 @@
+{
+  "$schema": "https://charm.land/crush.json",
+  "providers": {
+    "GEMINI": {
+      "type": "openai",
+      "base_url": "https://newapi.aliyahzombie.top/v1",
+      "api_key": "$GEMINI_KEY",
+      "models": [
+        {
+          "id": "gemini-2.5-pro",
+          "name": "gemini2.5pro",
+          "cost_per_1m_in": 2.5,
+          "cost_per_1m_out": 10,
+          "context_window": 320000,
+          "default_max_tokens": 310000
+        }
+      ]
+    }
+
+  }
+}
