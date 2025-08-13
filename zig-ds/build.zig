@@ -221,4 +221,19 @@ pub fn build(b: *std.Build) void {
 
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_lib_unit_tests.step);
+
+    const test_array_list_mod = b.addModule("test_array_list", .{
+        .root_source_file = b.path("src/test/TestArrayList.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    test_array_list_mod.addImport("zig-ds", module);
+
+    // Fixed: Removed target and optimize from TestOptions
+    const test_array_list = b.addTest(.{
+        .root_module = test_array_list_mod,
+    });
+
+    const run_test_array_list = b.addRunArtifact(test_array_list);
+    test_step.dependOn(&run_test_array_list.step);
 }
