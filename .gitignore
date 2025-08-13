@@ -7,3 +7,5 @@ tmp/
 .markdownlint.json
 .todo
 /*.hxml
+*.zig-cache
+*.tar.xz
